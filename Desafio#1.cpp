@@ -22,37 +22,10 @@ void setup()
   Serial.begin(9600);
   lcd_1.begin(16, 2);
 }
+int anloPin=0;
+int val=0;
 
-void loop()
-{ 
-  if(digitalRead(buttonStart) == HIGH) {
-    i = 0;
-    startData = true;
-  	lcd_1.setCursor(0, 0);
-  	lcd_1.print("Almacenando");
-  	lcd_1.setCursor(0, 1);
-  	lcd_1.print("Datos...");
-  }
-  
-  if (startData){
-    almacenarDatos();
-  }
-  if(digitalRead(buttonInfo) == HIGH) {
-    i = 0;
-    startInfo = true;
-  	lcd_1.setCursor(0, 0);
-  	lcd_1.print("Mostrandolos");
-  	lcd_1.setCursor(0, 1);
-  	lcd_1.print("Datos...");
-  }
-  if (startInfo){
-    startData = false;
-    datos();
-    startInfo= false;
-    startData = true;
-  }
-  
-}
+void loop(){
 
 void almacenarDatos() {
   val = analogRead(analogPin);
@@ -64,6 +37,12 @@ void almacenarDatos() {
     i = 0;
   }
 }
+Adafruit_LiquidCrystal lcd_1(0);
+
+void setup (){
+    lcd_1.begin(16.2);
+    Serial.begin(16,2);
+    lcd_1.clear();
 
 void mostrarDatos(float vol, float frec){
   lcd_1.clear();
@@ -75,4 +54,3 @@ void mostrarDatos(float vol, float frec){
   lcd_1.print(frec,9);
   delay(3000);
 }
-void ()
