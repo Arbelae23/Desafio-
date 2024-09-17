@@ -1,14 +1,29 @@
 // C++ code
 //
+#include <Adafruit_liquidCrystal.h>
 void setup()
 {
-  pinMode(LED_BUILTIN, OUTPUT);
+
 }
 
+int analogPin=0;
+int val=0;
+
 void loop()
+Adafruit_liquidCrystal 1cd_1(0);
+
+void setup()
 {
-  digitalWrite(LED_BUILTIN, HIGH);
-  delay(1000); // Wait for 1000 millisecond(s)
-  digitalWrite(LED_BUILTIN, LOW);
-  delay(1000); // Wait for 1000 millisecond(s)
+  lcd_1.begin(16,2);
+  Serial.begin(9600);
+  lcd_1.clear();
+}
+
+void loop(){
+  lcd_1.setCursor(0,0);
+  val=analogRead(analogPin);
+  lcd_1.print(val);
+  delay(500);
+  Serial.Println(val);
+  lcd_1.clear();
 }
