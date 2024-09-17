@@ -3,8 +3,8 @@
 #include <Adafruit_liquidCrystal.h>
 Adafruit_LiquidCrystal lcd_1(0);
 /*
-Recoleccion de datos
-Falta corregir el funcionamiento del boton 2 y verificar los datos 
+RECOLECCIÓN DE DATOS Y MUESTRA DE DATOS RECOGIDOS.
+
 */
 
 int analogPin=0;
@@ -13,8 +13,10 @@ int buttonStart = 4;
 int buttonInfo = 2;
 bool startData=false;
 bool startInfo = false;
-float *signal;
 int arregloSize = 300;
+float *signal = new float [arregloSize];
+
+int i = 0;
 
 
 void setup()
@@ -29,52 +31,61 @@ void loop()
 {
   
   if (digitalRead(buttonStart)==HIGH){
+    i=0;
     startData=true;
-
-  if(digitalRead(buttonInfo) == HIGH) {
-    startInfo = true;
-    lcd_1.clear();
-  	lcd_1.setCursor(0, 0);
-  	lcd_1.print("Mostrando");
-  	lcd_1.setCursor(0, 1);
-  	lcd_1.print("Datos...");
-  }
-  if(digitalRead(buttonInfo) == HIGH) {
-    startInfo = true;
-    lcd_1.clear();
-  	lcd_1.setCursor(0, 0);
-  	lcd_1.print("Mostrando");
-  	lcd_1.setCursor(0, 1);
-  	lcd_1.print("Datos...");
+      lcd_1.setCursor(0, 0);
+  	  lcd_1.print("Almacenando");
+  	  lcd_1.setCursor(0, 1);
+  	  lcd_1.print("Datos...");
   }
   if (startData){
-  	almacenarDatos();
-
+    almacenarDatos();
+  }
+  if(digitalRead(buttonInfo) == HIGH) {
+    i=0;
+    startInfo = true;
+  
+  	  lcd_1.setCursor(0, 0);
+  	  lcd_1.print("Mostrandolos");
+  	  lcd_1.setCursor(0, 1);
+  	  lcd_1.print("Datos...");
+  }
+  if(digitalRead(buttonInfo) == HIGH) {
+    i=0;
+    startInfo = true;
+    
+      lcd_1.setCursor(0, 0);
+      lcd_1.print("Mostrandolos");
+      lcd_1.setCursor(0, 1);
+      lcd_1.print("Datos...");
   }
 
   if (startInfo){
     startData = false;
-  	mostrarDatos();
+  mostrarDatos();
   }
   
 }
   void almacenarDatos(){
-    signal = new float[arregloSize];
-    for (int i = 0 ;i< arregloSize; i++) {
-      val = analogRead(analogPin);
-      val = val*(5.0/1023.0);
-      signal[i]=val;
-      Serial.println(signal[i]);
-      delay(10);
+  val = analogRead(analogPin);
+  val = val*(5.0/1023.0);
+  signal[i] = val;
+  Serial.println(signal[i]);
+  delay(10);
+  i++;
+  if (i >= arregloSize){
+    i = 0;
     }
   }
   void mostrarDatos(){
-    /*
-    lcd_1.setCursor(2, 1);
-    lcd_1.print(val);
-    Serial.Println(val);
     
+    Serial.println(signal[i]); 
     delay(10);
-    lcd_1.clear();*/
-
-}
+    i++;
+    if (i>=arregloSize){
+      i=0;
+      startInfo = false
+      startData = true
+    }
+  
+  }
