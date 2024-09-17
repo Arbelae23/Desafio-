@@ -1,18 +1,21 @@
 // C++ code
 //
 #include <Adafruit_liquidCrystal.h>
+Adafruit_LiquidCrystal lcd_1(0);
 /*
-Montaje con dos pulsadores: uno para iniciar la muestra de datos y
-otro para detenerla. En realidad, un pulsador en alto permite que se
-haga la lectura del pin analógico, mientras que el otro pulsador en
-alto le asigna un valor de 0 a este pin.
+Recoleccion de datos
+Falta corregir el funcionamiento del boton 2 y verificar los datos 
 */
 
 int analogPin=0;
-int val=0;
-int button1Pin=2;
-int button2Pin=4;
+float val=0;
+int buttonStart = 4;
+int buttonInfo = 2;
 bool startData=false;
+bool startInfo = false;
+float *signal;
+int arregloSize = 300;
+
 
 void setup()
 {
@@ -24,21 +27,54 @@ void setup()
 
 void loop()
 {
-  lcd_1.setCursor(2,1);
-  if (digitalRead(button1Pin)==HIGH){
+  
+  if (digitalRead(buttonStart)==HIGH){
     startData=true;
+
+  if(digitalRead(buttonInfo) == HIGH) {
+    startInfo = true;
+    lcd_1.clear();
+  	lcd_1.setCursor(0, 0);
+  	lcd_1.print("Mostrando");
+  	lcd_1.setCursor(0, 1);
+  	lcd_1.print("Datos...");
   }
-  if (digitalRead(button2Pin)==HIGH){
-    startData=false;
+  if(digitalRead(buttonInfo) == HIGH) {
+    startInfo = true;
+    lcd_1.clear();
+  	lcd_1.setCursor(0, 0);
+  	lcd_1.print("Mostrando");
+  	lcd_1.setCursor(0, 1);
+  	lcd_1.print("Datos...");
   }
   if (startData){
-    val=analogRead(analogPin);
+  	almacenarDatos();
+
   }
-  else{
-    val=0;
+
+  if (startInfo){
+    startData = false;
+  	mostrarDatos();
   }
-  Serial.Println(val);
-  lcd_1.clear();
-  delay(10);
+  
+}
+  void almacenarDatos(){
+    signal = new float[arregloSize];
+    for (int i = 0 ;i< arregloSize; i++) {
+      val = analogRead(analogPin);
+      val = val*(5.0/1023.0);
+      signal[i]=val;
+      Serial.println(signal[i]);
+      delay(10);
+    }
+  }
+  void mostrarDatos(){
+    /*
+    lcd_1.setCursor(2, 1);
+    lcd_1.print(val);
+    Serial.Println(val);
+    
+    delay(10);
+    lcd_1.clear();*/
 
 }
