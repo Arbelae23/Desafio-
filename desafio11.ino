@@ -1,7 +1,12 @@
 // C++ code
 //
 #include <Adafruit_liquidCrystal.h>
-
+/*
+Montaje con dos pulsadores: uno para iniciar la muestra de datos y
+otro para detenerla. En realidad, un pulsador en alto permite que se
+haga la lectura del pin analógico, mientras que el otro pulsador en
+alto le asigna un valor de 0 a este pin.
+*/
 
 int analogPin=0;
 int val=0;
@@ -34,4 +39,6 @@ void loop()
   }
   Serial.Println(val);
   lcd_1.clear();
+  delay(10);
+
 }
