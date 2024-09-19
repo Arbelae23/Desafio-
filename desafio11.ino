@@ -1,5 +1,4 @@
-// C++ code
-//
+
 #include <Adafruit_LiquidCrystal.h>
 Adafruit_LiquidCrystal lcd_1(0);
 
@@ -9,7 +8,7 @@ int buttonStart = 4;//el boton que empieza a resivir info esta en el pin 4
 int buttonInfo = 2;//boton que finaliza el resivir info ubicado en el pin 2
 bool startData=false; //booleano que nos ayuda a saber cuan empezamos a resivir info
 bool startInfo = false;
-float tolerancia = 0.04;// usamos un valor de tolerancia ya que los valores no siempre dan cerrados
+float tolerancia = 0.03;// usamos un valor de tolerancia ya que los valores no siempre dan cerrados
 
 int arregloSize = 230; //tamaño del arreglo 
 float *signal = new float [arregloSize]; //arreglo dinamico que almacena los datos
@@ -21,7 +20,7 @@ void setup()
 {
   pinMode(2,INPUT);//el pin 2 es de entrada 
   pinMode(4,INPUT);//pin 4 de entrada 
-  Serial.begin(9600);
+  Serial.begin(9600);//inicializacion del monitor serial
   lcd_1.begin(16,2);
 }
 
@@ -47,7 +46,7 @@ void loop()
     i=0;
     startInfo = true;
     lcd_1.clear();
-    lcd _1.setCursor(0, 0);
+    lcd_1.setCursor(0, 0);
     lcd_1.print("Mostrandolos");
     lcd_1.setCursor(0, 1);
     lcd_1.print("Datos...");
@@ -76,9 +75,9 @@ void almacenarDatos(){
 void mostrarDatos(float vol, float frec){
  /* funcion que muestra los 
  resultados en el lcd */
-  lcd_1.setCursor(0,1);
+  lcd_1.setCursor(0,1);//ubicar el cursor
   lcd_1.print("v=");
-  lcd_1.print(vol,2);
+  lcd_1.print(vol,2);//imprimir segudo vol y dar solo dos decimales
   lcd_1.setCursor(7,1);
   lcd_1.print("f=");
   lcd_1.print(frec,2);
@@ -86,17 +85,18 @@ void mostrarDatos(float vol, float frec){
 
 void datos(){
   /*buscamos el max y min para los calculos, recorremos 
-  el arreglo y usamos puntero*/
+  el arreglo y usamos punteros*/
   lcd_1.clear();
  
-  float min=signal[0];
+  float min=signal[0];//empiezo desde la primera posicion
   float max=signal[0];
   float amplitud, frecuencia, periodo, t1, t2;
-  float *maxnext;
+  float *maxnext;//puntero para la direccion de la señal
+  float *dirsignal;//usamos puntero para no trabajar con variables contadoras
   int m=0;
   maxnext=signal;
   for(m;m<arregloSize;m++){
-    if (signal[m]>min){
+      if (signal[m]<min){
       min=signal[m];
     }
     if (signal[m]>max){
@@ -123,25 +123,32 @@ void datos(){
 
 //frecuencia
 
-  float cero= (min +max)/2;
+  float cero= (min +max)/2; //buscamos la ubicacion del eje y que sera la mitad de la funcion
+  /*Bucamos los cruces en el eje y
+   para guardar las pociciones donde aparecen en t1 y t2*/
+  dirsignal=signal;
   for (int j =0;j<arregloSize;j++){
-    if (abs(abs(signal[j])-cero)<tolerancia){
+    if (abs(*dirsignal-cero)<tolerancia){//
       t1=j;
       break;
     }
+    dirsignal++;
   }
   for (int j=0;j<arregloSize;j++){
-    if (abs(abs(signal[j])-cero)<tolerancia && t1!=j){
+    if (abs(*dirsignal-cero)<tolerancia){
       t2=j;
       break;
     }
+    dirsignal++;
   }
   float diferencia=abs(abs(max)-abs(*maxnext));
+  //miramos cual es la diferencia, si son iguales quiere decir que es cuadrada ya que el valor maaximo siempre es el mismo por ende es cuadrada
   if (diferencia==0){
     lcd_1.setCursor(0,0);
     lcd_1.print("Cuadrada");
   }
-  else if (diferencia<tolerancia && diferencia>0){
+  else if (diferencia < tolerancia && diferencia>0){
+    //miramos que tan "rapido" pasa entre max y los comparamos con el valor de la tolerancia, entre mas grande sea sera una triangular
     lcd_1.setCursor(0,0);
     lcd_1.print("Senoidal");
   }
@@ -153,10 +160,11 @@ void datos(){
     lcd_1.setCursor(0,0);
     lcd_1.print("Desconocida");
   }
-  periodo= 2*10*abs(t2-t1)/1000;
-  frecuencia=1/periodo;
+  periodo= 2*10*abs(t2-t1)/100; //convierto a segundos, resto las pocisiones para saber el tiempo y multplico por dos para hallar la frecuencia completa, ya que solo hallamos la mitad del perido
+  frecuencia=1/periodo; //calculamos la frecuencia con el inverso del periodo
   Serial.println(periodo);
   mostrarDatos(amplitud,frecuencia);
+  delete [] signal;//libero memoria
 }
 
 
